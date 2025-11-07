@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale:1.0">
+    <title>VHI Kiosk Qualifier (3-Role)</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Custom style for the selected card state */
+        .role-card.selected {
+            border-color: #F50A23;
+            /* box-shadow: 0 4px 14px 0 rgba(245, 10, 35, 0.3); - REMOVED */
+            /* background-color: #fffafb; - REMOVED */
+        }
+
+        /* Hover state for cards - only when not selected */
+        .role-card:not(.selected):hover {
+            border-color: #F50A23;
+        }
+
+        .card-default-border {
+            border-color: rgb(224, 224, 224);
+        }
+
+        /* Checkmark icon for selected state - REMOVED */
+        
+        /* .role-card.selected .checkmark { ... } - REMOVED */
+
+        /* --- NEW ---: Style for disabled cards */
+        .role-card.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none; /* This prevents all click/hover events */
+        }
+    </style>
+</head>
+<body class="p-8 min-h-screen"> <!-- Removed bg-gray-100 -->
+
+    <div class="max-w-4xl mx-auto">
+        <!-- UPDATED HEADLINE -->
+        <h1 class="text-3xl font-bold text-gray-900 text-center">Find out which plan is right for your home</h1>
+        <!-- UPDATED SUB-HEADLINE -->
+        <p class="text-lg text-gray-600 text-center mt-2 mb-8">Choose all that apply to your household to help you determine the right plan for your devices and usage.</p>
+
+        <!-- Container for the 3 Role Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <!-- Tile 1 (The Qualifier) -->
+            <!-- UPDATED: Added flex, flex-col, items-center, text-center -->
+            <div id="basic-user" class="role-card relative bg-white p-6 rounded-xl border-2 card-default-border cursor-pointer transition-all flex flex-col items-center text-center" data-role="qualifier" tabindex="0">
+                <h2 class="text-xl font-semibold text-gray-800">Basic User</h2>
+                <p class="text-gray-600 mt-2">Email, web browsing, & occasional light streaming.</p>
+                <!-- ADDED ICON -->
+                <svg class="w-12 h-12 text-gray-900 mt-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.5v-2.25A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v2.25m-18 0v-2.25a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 15.75v-2.25m-18 0h18" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.06 10.5a6 6 0 00-6.12 0" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.284 8.37a3 3 0 00-2.568 0" />
+                </svg>
+            </div>
+
+            <!-- Tile 2 (Disqualifier) -->
+            <!-- UPDATED: Added flex, flex-col, items-center, text-center -->
+            <div id="power-user" class="role-card relative bg-white p-6 rounded-xl border-2 card-default-border cursor-pointer transition-all flex flex-col items-center text-center" data-role="disqualifier" tabindex="0">
+                <h2 class="text-xl font-semibold text-gray-800">Power User</h2>
+                <p class="text-gray-600 mt-2">4K video, competitive gaming, or video conferencing 3+ days a week.</p>
+                <!-- ADDED ICON -->
+                <svg class="w-12 h-12 text-gray-900 mt-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21l1.5-9.75H3.75z" />
+                </svg>
+            </div>
+
+            <!-- Tile 3 (Disqualifier) -->
+            <!-- UPDATED: Added flex, flex-col, items-center, text-center -->
+            <div id="large-household" class="role-card relative bg-white p-6 rounded-xl border-2 card-default-border cursor-pointer transition-all flex flex-col items-center text-center" data-role="disqualifier" tabindex="0">
+                <h2 class="text-xl font-semibold text-gray-800">Large Household</h2>
+                <p class="text-gray-600 mt-2">4+ people in the home or 8+ connected devices.</p>
+                <!-- ADDED ICON -->
+                <svg class="w-12 h-12 text-gray-900 mt-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.64-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM18.75 8.25a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0z" />
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Recommendation Boxes -->
+        <div class="mt-8">
+
+            <!-- 🟢 VHI Lite Confirmation Box (Now "LTE Home") -->
+            <div id="lite-box" class="bg-white border border-[#343330] rounded-[11px] p-4 text-left flex flex-col gap-2 max-w-[400px] w-full mx-auto" style="display: none;">
+                <!-- REMOVED: <span class="recommended-tag ...">Recommended</span> -->
+                <div class="plan-result">
+                    <!-- UPDATED TITLE -->
+                    <span class="text-[1.75rem] font-bold text-[#111] block">LTE Home</span>
+                    <!-- UPDATED DESCRIPTION -->
+                    <p class="text-base text-[#333] mt-0 mb-4">Up to 50 Mbps download. Good for basic browsing and SD streaming.</p>
+                    <a href="#" class="text-base font-semibold text-[#F50A23] no-underline hover:underline">Discover 5G home plans ></a>
+                </div>
+            </div>
+
+            <!-- 🔴 Wi-Fi Backup Recommendation Box -->
+            <div id="backup-box" class="bg-white border border-[#34330] rounded-[11px] p-4 text-left flex flex-col gap-2 max-w-[400px] w-full mx-auto" style="display: none;">
+                <!-- REMOVED: <span class="recommended-tag ...">Recommended</span> -->
+                <div class="plan-result">
+                    <!-- UPDATED TITLE -->
+                    <span class="text-[1.75rem] font-bold text-[#111] block">Wi-Fi Backup</span>
+                    <!-- UPDATED DESCRIPTION -->
+                    <p class="text-base text-[#333] mt-0 mb-4">Your need for high-quality streaming or dedicated remote work requires the stability of Wi-Fi Backup.</p>
+                    <!-- UPDATED LINK -->
+                    <a href="#" class="text-base font-semibold text-[#F50A23] no-underline hover:underline">Discover Wi-Fi Backup ></a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Reset Button - MOVED -->
+        <div class="text-center mt-8">
+            <!-- UPDATED: Removed h- and leading- classes, using inline style to force height -->
+            <a href="#" id="reset-btn" class="bg-black text-white font-semibold px-10 rounded-full hover:opacity-80 transition-all no-underline inline-block" style="display: none; height: 66px; line-height: 66px;">Start Over</a>
+        </div>
+
+    </div>
+
+    <!-- The JavaScript for THIS 3-Role Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Get all the elements we need
+            const allCards = document.querySelectorAll('.role-card');
+            const liteBox = document.getElementById('lite-box');
+            const backupBox = document.getElementById('backup-box');
+            const resetButton = document.getElementById('reset-btn');
+
+            // --- Reset Function ---
+            const resetTool = (e) => {
+                if (e) e.preventDefault(); // Prevent link behavior if it's an event
+                
+                // 1. Deselect all cards
+                allCards.forEach(card => {
+                    card.classList.remove('selected');
+                    card.classList.remove('disabled'); // <-- NEW: Re-enable cards
+                });
+                
+                // 2. Hide both recommendation boxes
+                liteBox.style.display = 'none';
+                backupBox.style.display = 'none';
+                
+                // 3. Hide the reset button itself
+                resetButton.style.display = 'none';
+            };
+            
+            // This is the main function that runs the logic
+            function checkRecommendation() {
+                // Count how many of each type of card is selected
+                // This is the key logic for this 3-tile system
+                const selectedDisqualifiers = document.querySelectorAll('.role-card[data-role="disqualifier"].selected').length;
+                const selectedQualifier = document.querySelectorAll('.role-card[data-role="qualifier"].selected').length;
+                const totalSelected = selectedDisqualifiers + selectedQualifier;
+
+                // --- This is the "Instant Override" Logic ---
+
+                // First, reset both boxes to hide them
+                liteBox.style.display = 'none';
+                backupBox.style.display = 'none';
+
+                if (selectedDisqualifiers > 0) {
+                    // IF ANY disqualifier is tapped, show the backup box.
+                    // This overrides everything else.
+                    backupBox.style.display = 'block';
+                } else if (selectedQualifier > 0) {
+                    // ELSE IF (and only if no disqualifiers are selected)
+                    // the qualifier is tapped, show the lite box.
+                    liteBox.style.display = 'block';
+                }
+                
+                // Show or hide the reset button
+                if (totalSelected > 0) {
+                    resetButton.style.display = 'inline-block'; // This will only change the display, preserving the inline style's height
+                    // --- NEW ---
+                    // Disable all cards now that a selection has been made
+                    allCards.forEach(card => {
+                        card.classList.add('disabled');
+                    });
+                    // --- END NEW ---
+                } else {
+                    resetButton.style.display = 'none';
+                }
+            }
+
+            // --- EVENT LISTENERS ---
+            
+            // 1. Add click listener to all cards
+            allCards.forEach(card => {
+                const toggleSelect = () => {
+                    // The 'disabled' class will prevent this from firing
+                    // because of 'pointer-events: none;' in the CSS.
+                    
+                    card.classList.toggle('selected');
+                    // Re-run the logic *every single time* a card is clicked
+                    checkRecommendation();
+                }
+                
+                // Add click event
+                card.addEventListener('click', toggleSelect);
+                
+                // Add keyboard event for accessibility (Enter or Space)
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        // Also check for disabled here for keyboard accessibility
+                        if (e.target.classList.contains('disabled')) {
+                            e.preventDefault();
+                            return;
+                        }
+                        e.preventDefault(); // Stop spacebar from scrolling
+                        toggleSelect();
+                    }
+                });
+            });
+            
+            // 2. Add click listener to the reset button
+            resetButton.addEventListener('click', resetTool);
+            
+            // 3. Initial state setup on load
+            resetTool(); // Call resetTool on load to set the initial state
+        });
+    </script>
+
+</body>
+</html>
+
