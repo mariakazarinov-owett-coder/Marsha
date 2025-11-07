@@ -1,457 +1,209 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plan Recommender</title>
+    <meta name="viewport" content="width=device-width, initial-scale:1.0">
+    <title>VHI Kiosk Qualifier (3-Role)</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Base styles */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #ffffff;
-            color: #111;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 2rem 2rem 6rem 2rem; /* Added more bottom padding */
-            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
         }
-
-        .container {
-            max-width: 900px;
-            width: 100%;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .subhead {
-            font-size: 1.25rem;
-            color: #555;
-            margin-bottom: 1rem; /* Reduced from 3rem */
-        }
-
-        /* New style for the added text */
-        .instruction-text {
-            font-size: 1rem;
-            color: #333; /* A bit darker to stand out as an instruction */
-            font-weight: 500;
-            margin-bottom: 2rem; /* 32px */
-        }
-
-        /* Card Grid - matches the 3x2 layout */
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-        }
-
-        /* Card Styling - UPDATED */
-        .role-card {
-            border: 1px solid #e0e0e0; /* CHANGED from 2px */
-            border-radius: 12px;
-            padding: 2rem 1.5rem;
-            text-align: center;
-            cursor: pointer;
-            transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s, border-width 0.2s;
-            height: 100%;
-            box-sizing: border-box; /* Important for grid layout */
-        }
-
-        .role-card:hover {
-            border-color: #F50A23; /* UPDATED from #999 */
-        }
-
-        /* This is the "Selected" state - UPDATED */
+        
+        /* Custom style for the selected card state */
         .role-card.selected {
-            border-color: #F50A23; /* UPDATED from #e60000 */
-            border-width: 2px; /* ADDED */
-            background-color: transparent; /* UPDATED from #ffebeb */
-            box-shadow: none; /* UPDATED from box-shadow */
-            /* We add padding to compensate for the border-width change to prevent layout shift */
-            padding: calc(2rem - 1px) calc(1.5rem - 1px);
+            border-color: #F50A23;
+            /* box-shadow: 0 4px 14px 0 rgba(245, 10, 35, 0.3); - REMOVED */
+            /* background-color: #fffafb; - REMOVED */
         }
 
-        .role-card svg {
-            width: 40px;
-            height: 40px;
-            margin-bottom: 1rem;
-            color: #333;
+        /* Hover state for cards - only when not selected */
+        .role-card:not(.selected):hover {
+            border-color: #F50A23;
         }
 
-        .role-card h3 {
-            font-size: 1.15rem;
-            font-weight: 600;
-            margin-top: 0;
-            margin-bottom: 0.5rem;
+        .card-default-border {
+            border-color: rgb(224, 224, 224);
         }
 
-        .role-card p {
-            font-size: 0.9rem;
-            color: #666;
-            line-height: 1.4;
-            margin: 0;
-        }
+        /* Checkmark icon for selected state - REMOVED */
+        
+        /* .role-card.selected .checkmark { ... } - REMOVED */
 
-        /* Button Container for "clear" and "get" */
-        .button-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 1.5rem;
-            margin-top: 3rem;
-            min-height: 58px; /* Reserve space to prevent layout jump */
-        }
-
-        /* "clear" button style */
-        .clear-button {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #fff;
-            background-color: #000;
-            border: none;
-            border-radius: 50px;
-            padding: 1rem 2.5rem;
-            text-decoration: none;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-        .clear-button:hover {
-            opacity: 0.8;
-        }
-
-        /* "Get Recommendation" Button */
-        .recommendation-button {
-            background-color: #000;
-            color: #fff;
-            border: none;
-            border-radius: 50px; /* Pill shape */
-            padding: 1rem 2.5rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: opacity 0.2s, background-color 0.2s;
-        }
-
-        .recommendation-button:hover:not(:disabled) {
-            opacity: 0.8;
-        }
-
-        /* Disabled state for the button */
-        .recommendation-button:disabled {
-            background-color: #ccc;
-            opacity: 0.7;
+        /* --- NEW ---: Style for disabled cards */
+        .role-card.disabled {
+            opacity: 0.6;
             cursor: not-allowed;
-        }
-
-        /* Recommendation Area */
-        #recommendation-wrapper {
-            display: none; /* Hidden by default */
-            width: 100%;
-            margin-top: 3rem; /* 48px padding */
-        }
-
-        /* Grid for recommendation cards */
-        .recommendation-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            max-width: 800px;
-            margin: 0 auto; 
-        }
-
-        /* Recommendation Card Style (per your spec) */
-        .recommendation-card {
-            display: flex;
-            /* height: 141px; -- REMOVED per user feedback */
-            padding: 16px; 
-            flex-direction: column;
-            justify-content: flex-start; /* Was center, changed to fix padding */
-            align-items: flex-start; /* Was center */
-            gap: 8px; /* Was 16px, tightened */
-            border-radius: 11px; /* Was 10.812px */
-            border: 1px solid #343330; /* Was 0.676px */
-            background-color: #fff;
-            text-align: left;
-            box-sizing: border-box; 
-        }
-        
-        /* Style for the "Recommended" one */
-        .recommendation-card.is-recommended {
-            border-color: #000; 
-            border-width: 1px; /* Make sure it's the same as the other */
-        }
-
-        /* New "Recommended" Tag style */
-        .recommended-tag {
-            display: inline-flex;
-            padding: 1px 3px; /* Was 1.351px 2.703px */
-            align-items: flex-start;
-            gap: 3px; /* Was 2.703px */
-            border-radius: 3px; /* Was 2.736px */
-            background: #000;
-            color: #fff;
-            font-size: 0.7rem; /* Added for clarity */
-            font-weight: 700;
-            line-height: 1.2;
-        }
-        
-        /* Hide tag if it's not the recommended card */
-        .recommendation-card:not(.is-recommended) .recommended-tag {
-            visibility: hidden;
-        }
-
-        .plan-result {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-            width: 100%; /* Ensure content fills card */
-        }
-
-        .plan-result span {
-            font-size: 1.75rem; 
-            font-weight: 700;
-            color: #111;
-            display: block; 
-            margin-bottom: 0.5rem; 
-        }
-
-        /* Plan description style */
-        .plan-description {
-            font-size: 1rem;
-            color: #333;
-            line-height: 1.5;
-            margin-bottom: 1.5rem;
-        }
-
-        /* Discover link style */
-        .discover-link {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #F50A23; /* UPDATED: Red */
-            text-decoration: none;
-        }
-        .discover-link:hover {
-            text-decoration: underline;
-        }
-        
-        /* Responsive Grid */
-        @media (max-width: 800px) {
-            .card-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            /* Stack recommendation cards on mobile */
-            .recommendation-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 550px) {
-            .card-grid {
-                grid-template-columns: 1fr;
-            }
-            h1 {
-                font-size: 2rem;
-            }
-            .subhead {
-                font-size: 1rem;
-            }
-            /* Fix selected card padding on mobile */
-            .role-card.selected {
-                padding: 2rem 1.5rem;
-                border-width: 2px;
-            }
+            pointer-events: none; /* This prevents all click/hover events */
         }
     </style>
 </head>
-<body>
+<body class="p-8 min-h-screen"> <!-- Removed bg-gray-100 -->
 
-    <div class="container">
-        
-        <!-- === SELECTION AREA (Always Visible) === -->
-        <div id="selection-screen">
-            <h1>Find out which plan is right for your home</h1>
-            <p class="subhead">We'll help you determine the right plan for your home based on your devices and usage.</p>
-            <p class="instruction-text">Chose all that apply to you</p>
+    <div class="max-w-4xl mx-auto">
+        <!-- UPDATED HEADLINE -->
+        <h1 class="text-3xl font-bold text-gray-900 text-center">Find out which plan is right for your home</h1>
+        <!-- UPDATED SUB-HEADLINE -->
+        <p class="text-lg text-gray-600 text-center mt-2 mb-8">Choose all that apply to your household to help you determine the right plan for your devices and usage.</p>
 
-            <div class="card-grid">
-                
-                <!-- Card 1: Heavy streamer/gamer -->
-                <div class="role-card" data-role="ROLE_4K_STREAMER" tabindex="0">
-                    <!-- Icon: Clapperboard -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m13.4 2-2.1 2.1 2.1 2.1"/><path d="m3.4 17.6 2.1-2.1-2.1-2.1"/><path d="m14 7 7 7"/><path d="M2.9 2.9 21.1 21.1"/><path d="M11 2 7 6l4 4"/><path d="m17 10 4 4-4 4"/><path d="m4 13 4 4H4Z"/><path d="m17 3 4 4h-4Z"/></svg>
-                    <h3>Heavy streamer/gamer</h3>
-                    <p>4K video, gaming, downloading large files.</p>
-                </div>
+        <!-- Container for the 3 Role Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-                <!-- Card 2: Remote Professional -->
-                <div class="role-card" data-role="ROLE_POWER_USER" tabindex="0">
-                    <!-- Icon: Lightning Bolt -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                    <h3>Remote Professional</h3>
-                    <p>Video conferencing 3+ days a week for work or school.</p>
-                </div>
-
-                <!-- Card 3: The Frequent Traveler -->
-                <div class="role-card" data-role="ROLE_INTERNATIONAL" tabindex="0">
-                    <!-- Icon: Plane -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 5.2 5.2c.4.4 1 .5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"></path></svg>
-                    <h3>The Frequent Traveler</h3>
-                    <p>Needs reliable data, maps, and calling while traveling abroad.</p>
-                </div>
-
-                <!-- Card 4: The Binge-Watcher -->
-                <div class="role-card" data-role="ROLE_HD_STREAMER" tabindex="0">
-                    <!-- Icon: Sliders (for HD) -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-4"/><path d="M12 14v-4"/><path d="M12 8V4"/><path d="M4 20h.01"/><path d="M4 14h.01"/><path d="M4 8h.01"/><path d="M20 20h.01"/><path d="M20 14h.01"/><path d="M20 8h.01"/></svg>
-                    <h3>The Binge-Watcher</h3>
-                    <p>Streams daily movies, TV shows, and music in high definition (HD).</p>
-                </div>
-
-                <!-- Card 5: The On-the-Go User -->
-                <div class="role-card" data-role="ROLE_CASUAL_HOTSPOT" tabindex="0">
-                    <!-- Icon: Smartphone Wifi -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line><path d="M8.29 12.29a.98.98 0 0 1 0-1.4 4.24 4.24 0 0 1 7.42 0 .98.98 0 0 1 0 1.4Z"/><path d="M10.66 9.91a.98.98 0 0 1 0-1.4 2.12 2.12 0 0 1 2.68 0 .98.98 0 0 1 0 1.4Z"/></svg>
-                    <h3>The On-the-Go User</h3>
-                    <p>Occasionally uses a mobile hotspot to connect a laptop or tablet.</p>
-                </div>
-                
-                <!-- Card 6: Basic user -->
-                <div class="role-card" data-role="ROLE_ESSENTIALS" tabindex="0">
-                    <!-- Icon: Laptop -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55A1 1 0 0 1 20.28 20H3.72a1 1 0 0 1-.99-1.45L4 16"></path></svg>
-                    <h3>Basic user</h3>
-                    <p>Email, browsing, occasional streaming.</p>
-                </div>
-
-            </div> <!-- end .card-grid -->
-
-            <!-- === ACTION AREA === -->
-            <!-- This area swaps between the "Get" button and the "Results" -->
-            
-            <div class="button-container" id="get-rec-wrapper">
-                <button class="recommendation-button" id="get-recommendation-btn" disabled>Get recommendation</button>
+            <!-- Tile 1 (The Qualifier) -->
+            <!-- UPDATED: Added flex, flex-col, items-center, text-center -->
+            <div id="basic-user" class="role-card relative bg-white p-6 rounded-xl border-2 card-default-border cursor-pointer transition-all flex flex-col items-center text-center" data-role="qualifier" tabindex="0">
+                <h2 class="text-xl font-semibold text-gray-800">Basic User</h2>
+                <p class="text-gray-600 mt-2">Email, web browsing, & occasional light streaming.</p>
+                <!-- ADDED ICON -->
+                <svg class="w-12 h-12 text-gray-900 mt-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.5v-2.25A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v2.25m-18 0v-2.25a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 15.75v-2.25m-18 0h18" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.06 10.5a6 6 0 00-6.12 0" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.284 8.37a3 3 0 00-2.568 0" />
+                </svg>
             </div>
-            
-            <div id="recommendation-wrapper">
-                <!-- Recommendation Grid -->
-                <div class="recommendation-grid">
-                    
-                    <!-- Card 1: The Dynamic Recommended Card -->
-                    <div class="recommendation-card is-recommended">
-                        <span class="recommended-tag">Recommended</span>
-                        <div class="plan-result">
-                            <span id="home-plan-name"></span>
-                            <p class="plan-description" id="home-plan-description"></p>
-                            <a href="#" class="discover-link">Discover 5G home plans ></a>
-                        </div>
-                    </div>
 
-                    <!-- Card 2: The Static "Other" Card from PDF -->
-                    <div class="recommendation-card">
-                        <span class="recommended-tag">Recommended</span> <!-- This is hidden by CSS -->
-                        <div class="plan-result">
-                            <span>5G Home Plus</span>
-                            <p class="plan-description">Great for streaming, browsing, and connecting multiple devices with typical download speeds of 50-300 Mbps.</p>
-                            <a href="#" class="discover-link">Discover 5G home plans ></a>
-                        </div>
-                    </div>
+            <!-- Tile 2 (Disqualifier) -->
+            <!-- UPDATED: Added flex, flex-col, items-center, text-center -->
+            <div id="power-user" class="role-card relative bg-white p-6 rounded-xl border-2 card-default-border cursor-pointer transition-all flex flex-col items-center text-center" data-role="disqualifier" tabindex="0">
+                <h2 class="text-xl font-semibold text-gray-800">Power User</h2>
+                <p class="text-gray-600 mt-2">4K video, competitive gaming, or video conferencing 3+ days a week.</p>
+                <!-- ADDED ICON -->
+                <svg class="w-12 h-12 text-gray-900 mt-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21l1.5-9.75H3.75z" />
+                </svg>
+            </div>
 
-                </div> <!-- end .recommendation-grid -->
+            <!-- Tile 3 (Disqualifier) -->
+            <!-- UPDATED: Added flex, flex-col, items-center, text-center -->
+            <div id="large-household" class="role-card relative bg-white p-6 rounded-xl border-2 card-default-border cursor-pointer transition-all flex flex-col items-center text-center" data-role="disqualifier" tabindex="0">
+                <h2 class="text-xl font-semibold text-gray-800">Large Household</h2>
+                <p class="text-gray-600 mt-2">4+ people in the home or 8+ connected devices.</p>
+                <!-- ADDED ICON -->
+                <svg class="w-12 h-12 text-gray-900 mt-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.64-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM18.75 8.25a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0z" />
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Recommendation Boxes -->
+        <div class="mt-8">
 
-                <!-- Clear button for Screen 2 -->
-                <div class="button-container">
-                    <button class="clear-button" id="clear-btn">clear</button>
+            <!-- 🟢 VHI Lite Confirmation Box (Now "LTE Home") -->
+            <div id="lite-box" class="bg-white border border-[#343330] rounded-[11px] p-4 text-left flex flex-col gap-2 max-w-[400px] w-full mx-auto" style="display: none;">
+                <!-- REMOVED: <span class="recommended-tag ...">Recommended</span> -->
+                <div class="plan-result">
+                    <!-- UPDATED TITLE -->
+                    <span class="text-[1.75rem] font-bold text-[#111] block">LTE Home</span>
+                    <!-- UPDATED DESCRIPTION -->
+                    <p class="text-base text-[#333] mt-0 mb-4">Up to 50 Mbps download. Good for basic browsing and SD streaming.</p>
+                    <a href="#" class="text-base font-semibold text-[#F50A23] no-underline hover:underline">Discover 5G home plans ></a>
                 </div>
-            </div> <!-- end #recommendation-wrapper -->
+            </div>
 
-        </div> <!-- end #selection-screen (this is now the whole page) -->
+            <!-- 🔴 Wi-Fi Backup Recommendation Box -->
+            <div id="backup-box" class="bg-white border border-[#34330] rounded-[11px] p-4 text-left flex flex-col gap-2 max-w-[400px] w-full mx-auto" style="display: none;">
+                <!-- REMOVED: <span class="recommended-tag ...">Recommended</span> -->
+                <div class="plan-result">
+                    <!-- UPDATED TITLE -->
+                    <span class="text-[1.75rem] font-bold text-[#111] block">Wi-Fi Backup</span>
+                    <!-- UPDATED DESCRIPTION -->
+                    <p class="text-base text-[#333] mt-0 mb-4">Your need for high-quality streaming or dedicated remote work requires the stability of Wi-Fi Backup.</p>
+                    <!-- UPDATED LINK -->
+                    <a href="#" class="text-base font-semibold text-[#F50A23] no-underline hover:underline">Discover Wi-Fi Backup ></a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Reset Button - MOVED -->
+        <div class="text-center mt-8">
+            <!-- UPDATED: Removed h- and leading- classes, using inline style to force height -->
+            <a href="#" id="reset-btn" class="bg-black text-white font-semibold px-10 rounded-full hover:opacity-80 transition-all no-underline inline-block" style="display: none; height: 66px; line-height: 66px;">Start Over</a>
+        </div>
 
-        <!-- Disclaimer text removed as requested -->
+    </div>
 
-    </div> <!-- end .container -->
-
-
+    <!-- The JavaScript for THIS 3-Role Logic -->
     <script>
-        // Wait for the document to be fully loaded
         document.addEventListener('DOMContentLoaded', () => {
 
-            // --- JAVASCRIPT LOGIC ---
-
-            // Step 1: The "Role-to-Tier Map" (The Brain)
-            // 3 = Ultimate, 2 = Plus, 1 = Welcome/Standard, 10 = LTE Home
-            const PLAN_MAP = {
-                "ROLE_4K_STREAMER":    { mobile: 3, home: 3 },
-                "ROLE_POWER_USER":     { mobile: 3, home: 3 },
-                "ROLE_INTERNATIONAL":  { mobile: 3, home: 1 },
-                "ROLE_HD_STREAMER":    { mobile: 2, home: 2 },
-                "ROLE_CASUAL_HOTSPOT": { mobile: 2, home: 1 },
-                "ROLE_ESSENTIALS":     { mobile: 1, home: 10 } // "Basic user" maps to "LTE Home"
-            };
-
-            // Tier numbers to Final Plan Names (from your flowchart)
-            const HOME_PLAN_INFO = {
-                0: { 
-                    name: "Make a selection", 
-                    description: "Select one or more activities above to see your recommended home plan." 
-                },
-                1: { 
-                    name: "5G Home", 
-                    description: "Good for basic browsing, email, and streaming on a few devices at great speeds." 
-                },
-                2: { 
-                    name: "5G Home Plus", 
-                    description: "Great for streaming, browsing, and connecting multiple devices with typical download speeds of 50-300 Mbps." 
-                },
-                3: { 
-                    name: "5G Home Ultimate", 
-                    description: "Best for 4K streaming, competitive gaming, and powering a large number of smart home devices at our fastest speeds."
-                },
-                // ADDED LTE PLANS FROM PDF
-                10: {
-                    name: "LTE Home",
-                    description: "Up to 50 Mbps download. Good for basic browsing and SD streaming."
-                },
-                11: {
-                    name: "LTE Home Plus",
-                    description: "Up to 50 Mbps download. Good for 1080p HD video streaming."
-                }
-            };
-
-
-            // Get all the HTML elements we need to interact with
+            // Get all the elements we need
             const allCards = document.querySelectorAll('.role-card');
-            
-            const getRecWrapper = document.getElementById('get-rec-wrapper'); 
-            const recButton = document.getElementById('get-recommendation-btn');
-            
-            const recWrapper = document.getElementById('recommendation-wrapper'); 
-            const clearBtn = document.getElementById('clear-btn'); 
-            
-            const homePlanNameEl = document.getElementById('home-plan-name');
-            const homePlanDescriptionEl = document.getElementById('home-plan-description'); 
-            
-            // --- EVENT LISTENERS ---
+            const liteBox = document.getElementById('lite-box');
+            const backupBox = document.getElementById('backup-box');
+            const resetButton = document.getElementById('reset-btn');
 
-            // Function to check if any card is selected
-            function checkSelection() {
-                const selectedCards = document.querySelectorAll('.role-card.selected');
-                // Enable or disable the button based on selection
-                recButton.disabled = selectedCards.length === 0;
+            // --- Reset Function ---
+            const resetTool = (e) => {
+                if (e) e.preventDefault(); // Prevent link behavior if it's an event
+                
+                // 1. Deselect all cards
+                allCards.forEach(card => {
+                    card.classList.remove('selected');
+                    card.classList.remove('disabled'); // <-- NEW: Re-enable cards
+                });
+                
+                // 2. Hide both recommendation boxes
+                liteBox.style.display = 'none';
+                backupBox.style.display = 'none';
+                
+                // 3. Hide the reset button itself
+                resetButton.style.display = 'none';
+            };
+            
+            // This is the main function that runs the logic
+            function checkRecommendation() {
+                // Count how many of each type of card is selected
+                // This is the key logic for this 3-tile system
+                const selectedDisqualifiers = document.querySelectorAll('.role-card[data-role="disqualifier"].selected').length;
+                const selectedQualifier = document.querySelectorAll('.role-card[data-role="qualifier"].selected').length;
+                const totalSelected = selectedDisqualifiers + selectedQualifier;
+
+                // --- This is the "Instant Override" Logic ---
+
+                // First, reset both boxes to hide them
+                liteBox.style.display = 'none';
+                backupBox.style.display = 'none';
+
+                if (selectedDisqualifiers > 0) {
+                    // IF ANY disqualifier is tapped, show the backup box.
+                    // This overrides everything else.
+                    backupBox.style.display = 'block';
+                } else if (selectedQualifier > 0) {
+                    // ELSE IF (and only if no disqualifiers are selected)
+                    // the qualifier is tapped, show the lite box.
+                    liteBox.style.display = 'block';
+                }
+                
+                // Show or hide the reset button
+                if (totalSelected > 0) {
+                    resetButton.style.display = 'inline-block'; // This will only change the display, preserving the inline style's height
+                    // --- NEW ---
+                    // Disable all cards now that a selection has been made
+                    allCards.forEach(card => {
+                        card.classList.add('disabled');
+                    });
+                    // --- END NEW ---
+                } else {
+                    resetButton.style.display = 'none';
+                }
             }
 
-            // 1. Logic for selecting/deselecting cards
+            // --- EVENT LISTENERS ---
+            
+            // 1. Add click listener to all cards
             allCards.forEach(card => {
                 const toggleSelect = () => {
+                    // The 'disabled' class will prevent this from firing
+                    // because of 'pointer-events: none;' in the CSS.
+                    
                     card.classList.toggle('selected');
-                    checkSelection(); // Check selection count after every click
+                    // Re-run the logic *every single time* a card is clicked
+                    checkRecommendation();
                 }
                 
                 // Add click event
@@ -460,77 +212,22 @@
                 // Add keyboard event for accessibility (Enter or Space)
                 card.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
+                        // Also check for disabled here for keyboard accessibility
+                        if (e.target.classList.contains('disabled')) {
+                            e.preventDefault();
+                            return;
+                        }
                         e.preventDefault(); // Stop spacebar from scrolling
                         toggleSelect();
                     }
                 });
             });
-
-            // Main recommendation function
-            function updateRecommendation() {
-                let maxHomeTier = 0;
-                const selectedCards = document.querySelectorAll('.role-card.selected');
-                
-                // This check is now redundant because button is disabled, but good to keep
-                if (selectedCards.length === 0) {
-                    homePlanNameEl.textContent = HOME_PLAN_INFO[0].name;
-                    homePlanDescriptionEl.textContent = HOME_PLAN_INFO[0].description;
-                    return; // Exit early
-                }
-
-                selectedCards.forEach(card => {
-                    const roleName = card.dataset.role;
-                    const tiers = PLAN_MAP[roleName];
-
-                    if (tiers) {
-                        maxHomeTier = Math.max(maxHomeTier, tiers.home);
-                    }
-                });
-
-                const finalHomePlan = HOME_PLAN_INFO[maxHomeTier];
-
-                // Set the text in the results area
-                homePlanNameEl.textContent = finalHomePlan.name;
-                homePlanDescriptionEl.textContent = finalHomePlan.description;
-            }
-
-            // Event listener for "Get Recommendation" button
-            recButton.addEventListener('click', () => {
-                // 1. Run the logic
-                updateRecommendation();
-                
-                // 2. Hide "Get" button wrapper
-                getRecWrapper.style.display = 'none';
-                
-                // 3. Show "Results" wrapper
-                recWrapper.style.display = 'block';
-            });
-
-
-            // Reset function
-            const clearSelections = (e) => {
-                if(e) e.preventDefault(); // Stop link from jumping
-                
-                // 1. Deselect all cards
-                allCards.forEach(card => {
-                    card.classList.remove('selected');
-                });
-                
-                // 2. Hide "Results" wrapper
-                recWrapper.style.display = 'none';
-                
-                // 3. Show "Get" button wrapper
-                getRecWrapper.style.display = 'flex'; // Use flex to match original style
-
-                // 4. Re-disable the button
-                recButton.disabled = true;
-            };
-
-            // Add event listeners for the clear button
-            clearBtn.addEventListener('click', clearSelections);
-
-            // Run checkSelection once on load to ensure button is disabled
-            checkSelection();
+            
+            // 2. Add click listener to the reset button
+            resetButton.addEventListener('click', resetTool);
+            
+            // 3. Initial state setup on load
+            resetTool(); // Call resetTool on load to set the initial state
         });
     </script>
 
